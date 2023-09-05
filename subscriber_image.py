@@ -17,6 +17,7 @@ def on_connect(client, userdata, flags, rc):  # The callback for when the client
 def on_message(client, userdata, message):
     print("Message received.")
     image_classify.mqtt_classify(message.payload)
+    
 	
 
 

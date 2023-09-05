@@ -88,5 +88,7 @@ def mqtt_classify(bytearray):
         print('%.1fms' % (inference_time * 1000))
 
     print('-------RESULTS--------')
+    ##invece di fare questa print, ritornare o una stringa o i dati necessari per creare un json da rispedire con mqtt
     for c in classes:
         print('%s: %.5f' % (labels.get(c.id, c.id), c.score))
+ 
