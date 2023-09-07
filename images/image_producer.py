@@ -10,19 +10,21 @@ HOST_NAME = 'circular.polito.it'
 # client name
 CLIENT_NAME = 'test'
 
+
 def on_connect(client, userdata, flags, rc):  # The callback for when the client connects to the broker
 	print("Connected with result code {0}".format(str(rc)))  # Print result of connection attempt
-	
+
+
 if __name__ == '__main__':
 	client =mqtt.Client(CLIENT_NAME)
 	client.on_connect = on_connect
 
-	client.tls_set(ca_certs="/home/francovolante/Desktop/certs/ca.crt")	
+	client.tls_set(ca_certs="/home/franco/Desktop/mqtt/certs/ca.crt")	#absolute path to the certificate
 	client.tls_insecure_set(True)
 	client.connect(HOST_NAME, port=8883)
 	
 	client.loop_start()
-	time.sleep(2)
+	time.sleep(1)
 
 	with open('parrot.jpg', 'rb') as file:
 		file_content = file.read()
@@ -35,3 +37,6 @@ if __name__ == '__main__':
 			print("Error in sending the message")
 	time.sleep(2)
 	client.loop_stop()
+	
+
+	
