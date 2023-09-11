@@ -6,10 +6,6 @@
 
 # NEXT STEPS
 
-- Aggiornare subscriber_image.py di modo che mandi un messaggio con il risultato su un broker
-
-- Aggiornare publish_image.py di modo che sia in ascolto una volta mandata l'immagine
-
 - Aggiornare classify_image_custom.py di modo che fornisca i risultati in un json/stringa
 
 ## PICCOLI ACCORGIMENTI
