@@ -3,6 +3,7 @@ import paho.mqtt.client as mqtt
 import json
 import time
 import classify_image_custom as image_classify
+import uuid
 
 # Client Name
 CLIENT_NAME = 'IoT'
@@ -22,8 +23,9 @@ def on_connect_resp(client, userdata, flags, rc):  # The callback for when the c
 
 def on_message(client, userdata, message):
     print("Message received.")
+    topic = message.topic
     image_classify.mqtt_classify(message.payload)
-    clients[1].publish("/fvolante/output", "work done")
+    clients[1].publish("/fvolante/output" + topic, "work done")
     time.sleep(1)
     print("Done")
     

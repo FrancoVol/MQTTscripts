@@ -1,5 +1,6 @@
 import paho.mqtt.client as mqtt
 import time
+import uuid
 
 #####IMPORTANT: RUN USING PYTHON3, DOES NOT WORK WITH PYTHON2 DUE TO THE FACT THAT PAHO MQTT ONLY SENDS STRINGS
 #####			FOR SOME REASON, AND IN THIS EXAMPLE THERE IS THE NEED TO SEND A BYTEARRAY
@@ -15,28 +16,32 @@ def on_connect(client, userdata, flags, rc):  # The callback for when the client
 	print("Connected with result code {0}".format(str(rc)))  # Print result of connection attempt
 
 
+
 if __name__ == '__main__':
-	client =mqtt.Client(CLIENT_NAME)
-	client.on_connect = on_connect
+    
+    idclient = uuid.UUID("01")
+    client =mqtt.Client(CLIENT_NAME)
+    client.on_connect = on_connect
 
-	client.tls_set(ca_certs="/home/franco/Desktop/mqtt/certs/ca.crt")	#absolute path to the certificate
-	client.tls_insecure_set(True)
-	client.connect(HOST_NAME, port=8883)
+    client.tls_set(ca_certs="/home/franco/Desktop/mqtt/certs/ca.crt")	#absolute path to the certificate
+    client.tls_insecure_set(False)
+    client.connect(HOST_NAME, port=8883)
 	
-	client.loop_start()
-	time.sleep(1)
-
-	with open('parrot.jpg', 'rb') as file:
-		file_content = file.read()
-		msg = bytearray(file_content)
-		result = client.publish("image/", msg)
-		msg_status = result[0]
-		if msg_status == 0:
-			print("Message sent correctly")
-		else:
-			print("Error in sending the message")
-	time.sleep(2)
-	client.loop_stop()
+    client.loop_start()
+    time.sleep(1)
+    
+    with open('parrot.jpg', 'rb') as file:
+        file_content = file.read()
+        msg = bytearray(file_content)
+        result = client.publish("image/"+ str(idclient), msg)
+        msg_status = result[0]
+        if msg_status == 0:
+            print("Message sent correctly")
+        else:
+         print("Error in sending the message")
+        
+    time.sleep(2)
+    client.loop_stop()
 	
 
 	
