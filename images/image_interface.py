@@ -24,8 +24,8 @@ def on_connect_resp(client, userdata, flags, rc):  # The callback for when the c
 def on_message(client, userdata, message):
     print("Message received.")
     topic = message.topic
-    image_classify.mqtt_classify(message.payload)
-    clients[1].publish("/fvolante/output" + topic, "work done")
+    outstring = image_classify.mqtt_classify(message.payload)
+    clients[1].publish("/fvolante/output" + topic, outstring)
     time.sleep(1)
     print("Done")
     
