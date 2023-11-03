@@ -10,8 +10,6 @@
 
 ## PICCOLI ACCORGIMENTI
 
-- classify_image_default.py è il codice di default degli esempi di Coral per classificare l'immagine, usato solo per prendere spunto per il custom
-
 - Tutti i file necessary al gateway vengono copiati nella cartella /home/fvolante/coral/tests e bisogna passare anche gli altri file necessari (es: i modelli tflite o i txt con i label)
 
-- code_snippets.py ha rimasugli di codice per la LSTM, si può ignorare.
+- code_snippets.py, default_inference_video.py, default_rtsp_listener.py e classify_image_default.py sono rimasugli di altri codice, tenuti ancora qui in fase di sviluppo, andranno rimossi perchè non facenti parte dello stack. Per ora rimangono perchè hanno delle parti di codice che potrebbero tornare utili in fase di debug o implementazione di altre features
