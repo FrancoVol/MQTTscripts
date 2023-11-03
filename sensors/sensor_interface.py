@@ -2,46 +2,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tflite_runtime.interpreter as tflite
 from zipfile import ZipFile
+import time
 import os
+import paho.mqtt.client as mqtt
 
 
-
-
-def set_input_tensor(interpreter, input):
-  input_details = interpreter.get_input_details()[0]
-  tensor_index = input_details['index']
-  input_tensor = interpreter.tensor(tensor_index)()
-  # Inputs for the TFLite model must be uint8, so we quantize our input data.
-  scale, zero_point = input_details['quantization']
-  #quantized_input = np.uint8(input / scale + zero_point) #gli input forniti sono già quantizzati
-  input_tensor[:, :, :] = input
-
-def predict_weather(interpreter, input):
-  set_input_tensor(interpreter, input)
-  interpreter.invoke()
-  output_details = interpreter.get_output_details()[0]
-  output = interpreter.get_tensor(output_details['index'])
-  # Outputs from the TFLite model are uint8, so we dequantize the results:
-  scale, zero_point = output_details['quantization']
-  output = scale * (output - zero_point)
-  return output
-
-
-
-def main():
-
-    interpreter = tflite.Interpreter('weather_forecast_quant.tflite', experimental_delegates=[tflite.load_delegate('libedgetpu.so.1')])
-    interpreter.allocate_tensors()
-
-    prediction = predict_weather(interpreter, input)
-    print('prediction:', prediction[0])
-
-
-if __name__ == "__main__":
-    main()
-
-
-
+# Client Name
+CLIENT_NAME = 'IoT'
+# Broker IP
+HOST_NAME = 'circular.polito.it'
+# Output host IP
+OUTPUT_HOST_NAME = 'test.mosquitto.org'
 
 #ogni riga è una misurazione di vari sensori
 #prova è un array di array (matrice for short)
@@ -172,6 +143,70 @@ input =  [[ 132 , 146 , 144 , 132 , 154 , 121 , 120 ],
 [ 137 , 133 , 130 , 124 , 138 , 134 , 132 ]]
 
 
+clients = []
 
-#[ 137 , 133 , 130 , 124 , 138 , 134 , 132 ]]
-#valore da dare per testare#
+interpreter = tflite.Interpreter('weather_forecast_quant.tflite', experimental_delegates=[tflite.load_delegate('libedgetpu.so.1')])
+interpreter.allocate_tensors()
+
+def on_connect(client, userdata, flags, rc):  # The callback for when the client connects to the broker
+	print("Connected to broker with result code {0}".format(str(rc)))  # Print result of connection attempt
+	client.subscribe('sensor/#')
+
+def on_connect_resp(client, userdata, flags, rc):  # The callback for when the client connects to the broker
+	print("Connected to broker with result code {0}".format(str(rc)))
+
+def on_message(client, userdata, message):
+    print("Message received.")
+    topic = message.topic
+    if(len(input)==120):
+      input.pop(0)
+    input.append(message.payload)
+    if (len(input) == 120):
+      topredict = np.uint8([input])
+      prediction = predict_weather(interpreter, topredict)
+      clients[1].publish("/fvolante/output" + topic, prediction[0])
+    time.sleep(1)
+    print("Done")
+
+def set_input_tensor(interpreter, input):
+  input_details = interpreter.get_input_details()[0]
+  tensor_index = input_details['index']
+  input_tensor = interpreter.tensor(tensor_index)()
+  # Inputs for the TFLite model must be uint8, so we quantize our input data.
+  scale, zero_point = input_details['quantization']
+  #quantized_input = np.uint8(input / scale + zero_point) #gli input forniti sono già quantizzati
+  input_tensor[:, :, :] = input
+
+def predict_weather(interpreter, input):
+  set_input_tensor(interpreter, input)
+  interpreter.invoke()
+  output_details = interpreter.get_output_details()[0]
+  output = interpreter.get_tensor(output_details['index'])
+  # Outputs from the TFLite model are uint8, so we dequantize the results:
+  scale, zero_point = output_details['quantization']
+  output = scale * (output - zero_point)
+  return output
+
+
+
+def main():
+  mqttClient = mqtt.Client(CLIENT_NAME)
+  mqttClient.on_connect = on_connect
+  mqttClient.on_message = on_message
+  mqttClient.tls_set(ca_certs="/home/fvolante/ca.crt")
+  mqttClient.tls_insecure_set(True)
+  mqttClient.connect(HOST_NAME, port=8883)
+  ret_client =mqtt.Client(CLIENT_NAME)
+  ret_client.on_connect = on_connect_resp
+  ret_client.connect(OUTPUT_HOST_NAME, port=1883)
+  clients.append(mqttClient)
+  clients.append(ret_client)
+  while(True):
+    for client in clients:
+      client.loop(0.1)
+
+
+if __name__ == "__main__":
+    main()
+
+

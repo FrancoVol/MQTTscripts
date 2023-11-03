@@ -16,7 +16,7 @@ clients = []
 
 def on_connect(client, userdata, flags, rc):  # The callback for when the client connects to the broker
 	print("Connected to broker with result code {0}".format(str(rc)))  # Print result of connection attempt
-	client.subscribe('#')
+	client.subscribe('image/#')
 
 def on_connect_resp(client, userdata, flags, rc):  # The callback for when the client connects to the broker
 	print("Connected to broker with result code {0}".format(str(rc)))

@@ -6,7 +6,7 @@
 
 # NEXT STEPS
 
-- Aggiornare classify_image_custom.py di modo che fornisca i risultati in un json/stringa
+- Raffinare il codice, dovrebbe funzionare tutto
 
 ## PICCOLI ACCORGIMENTI
 
@@ -14,4 +14,4 @@
 
 - Tutti i file necessary al gateway vengono copiati nella cartella /home/fvolante/coral/tests e bisogna passare anche gli altri file necessari (es: i modelli tflite o i txt con i label)
 
-- code_snippets.py ha rimasugli di codice per la LSTM che è ancora da testare.
+- code_snippets.py ha rimasugli di codice per la LSTM, si può ignorare.
