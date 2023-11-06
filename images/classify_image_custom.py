@@ -41,7 +41,6 @@ from pycoral.utils.dataset import read_label_file
 from pycoral.utils.edgetpu import make_interpreter
 
 def mqtt_classify(bytearray):
-    outstring = ""
     labels = read_label_file("test_data/inat_bird_labels.txt")
     interpreter = make_interpreter("test_data/mobilenet_v2_1.0_224_inat_bird_quant_edgetpu.tflite")
     interpreter.allocate_tensors()
@@ -92,5 +91,5 @@ def mqtt_classify(bytearray):
     ##invece di fare questa print, ritornare o una stringa o i dati necessari per creare un json da rispedire con mqtt
     for c in classes:
         #print('%s: %.5f' % (labels.get(c.id, c.id), c.score))
-        outstring = outstring + "\n" + labels.get(c.id,c.id) + ": " + c.score
+        outstring = "%s: %.5f" % (labels.get(c.id,c.id), c.score)
     return outstring

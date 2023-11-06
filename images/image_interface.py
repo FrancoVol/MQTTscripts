@@ -12,7 +12,7 @@ HOST_NAME = 'circular.polito.it'
 # Output host IP
 OUTPUT_HOST_NAME = 'test.mosquitto.org'
 
-clients = []
+#clients = []
 
 def on_connect(client, userdata, flags, rc):  # The callback for when the client connects to the broker
 	print("Connected to broker with result code {0}".format(str(rc)))  # Print result of connection attempt
@@ -25,9 +25,14 @@ def on_message(client, userdata, message):
     print("Message received.")
     topic = message.topic
     outstring = image_classify.mqtt_classify(message.payload)
-    clients[1].publish("/fvolante/output" + topic, outstring)
-    time.sleep(1)
-    print("Done")
+    ret_client = mqtt.Client(CLIENT_NAME)
+    ret_client.on_connect = on_connect_resp
+    ret_client.connect(OUTPUT_HOST_NAME,port=1883)
+    ret_client.loop_start()
+    ret_client.publish("fvolante/output/" + topic, str(outstring))
+    ret_client.loop_stop()
+    ret_client.disconnect()
+    print("Done publishing " + str(outstring))
     
 	
 
@@ -37,17 +42,19 @@ if __name__ == '__main__':
 	mqttClient = mqtt.Client(CLIENT_NAME)
 	mqttClient.on_connect = on_connect
 	mqttClient.on_message = on_message
-	mqttClient.tls_set(ca_certs="/home/fvolante/ca.crt")
-	mqttClient.tls_insecure_set(True)
+	mqttClient.tls_set(ca_certs="/home/fvolante/ca.crt", certfile="/home/fvolante/server.crt", keyfile="/home/fvolante/server.key")	#absolute path to the certificate
+	mqttClient.username_pw_set(username="gateway", password="gateway")
+	mqttClient.tls_insecure_set(False)
 	mqttClient.connect(HOST_NAME, port=8883)
-	ret_client =mqtt.Client(CLIENT_NAME)
-	ret_client.on_connect = on_connect_resp
-	ret_client.connect(OUTPUT_HOST_NAME, port=1883)
-	clients.append(mqttClient)
-	clients.append(ret_client)
-	while(True):
-		for client in clients:
-			client.loop(0.1)
+	mqttClient.loop_forever()
+	# ret_client =mqtt.Client(CLIENT_NAME)
+	# ret_client.on_connect = on_connect_resp
+	# ret_client.connect(OUTPUT_HOST_NAME, port=1883)
+	# clients.append(mqttClient)
+	# clients.append(ret_client)
+	# while(True):
+	# 	for client in clients:
+	# 		client.loop(3)
 		
 
 	

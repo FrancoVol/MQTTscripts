@@ -19,11 +19,12 @@ def on_connect(client, userdata, flags, rc):  # The callback for when the client
 
 if __name__ == '__main__':
     
-    idclient = uuid.UUID("03")
+    idclient = uuid.uuid1()
     client =mqtt.Client(CLIENT_NAME)
     client.on_connect = on_connect
 
-    client.tls_set(ca_certs="/home/franco/Desktop/mqtt/certs/ca.crt")	#absolute path to the certificate
+    client.tls_set(ca_certs="/home/francovolante/Desktop/certs/ca.crt", certfile="/home/francovolante/Desktop/certs/client.crt", keyfile="/home/francovolante/Desktop/certs/client.key")	#absolute path to the certificate
+    client.username_pw_set(username="sensor", password="sensor")
     client.tls_insecure_set(False)
     client.connect(HOST_NAME, port=8883)
 	
@@ -31,7 +32,7 @@ if __name__ == '__main__':
     msg = [ 137 , 133 , 130 , 124 , 138 , 134 , 132 ]
     time.sleep(1)
     
-    result = client.publish("image/"+ str(idclient), msg)
+    result = client.publish("input/image/"+ str(idclient), str(msg))
     msg_status = result[0]
     if msg_status == 0:
         print("Message sent correctly")

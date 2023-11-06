@@ -8,7 +8,7 @@ HOST_NAME = 'test.mosquitto.org'
 
 def on_connect(client, userdata, flags, rc):  # The callback for when the client connects to the broker
 	print("Connected to broker with result code {0}".format(str(rc)))  # Print result of connection attempt
-	client.subscribe('/fvolante/output/sensor/#')
+	client.subscribe('fvolante/output/sensor/#')
  
 def on_message(client, userdata, message):
     print("Message received: ", message.payload)

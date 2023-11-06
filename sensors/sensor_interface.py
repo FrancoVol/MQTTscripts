@@ -164,7 +164,14 @@ def on_message(client, userdata, message):
     if (len(input) == 120):
       topredict = np.uint8([input])
       prediction = predict_weather(interpreter, topredict)
-      clients[1].publish("/fvolante/output" + topic, prediction[0])
+      ret_client =mqtt.Client(CLIENT_NAME)
+      ret_client.on_connect = on_connect_resp
+      ret_client.connect(OUTPUT_HOST_NAME, port=1883)
+      ret_client.loop_start()
+      ret_client.publish("/fvolante/output/" + topic, prediction[0])
+      ret_client.loop_stop()
+      ret_client.disconnect()
+      
     time.sleep(1)
     print("Done")
 
@@ -193,17 +200,11 @@ def main():
   mqttClient = mqtt.Client(CLIENT_NAME)
   mqttClient.on_connect = on_connect
   mqttClient.on_message = on_message
-  mqttClient.tls_set(ca_certs="/home/fvolante/ca.crt")
-  mqttClient.tls_insecure_set(True)
+  mqttClient.tls_set(ca_certs="/home/francovolante/Desktop/certs/ca.crt", certfile="/home/fvolante/server.crt", keyfile="/home/fvolante/server.key")	#absolute path to the certificate
+  mqttClient.username_pw_set(username="gateway", password="gateway")
+  mqttClient.tls_insecure_set(False)
   mqttClient.connect(HOST_NAME, port=8883)
-  ret_client =mqtt.Client(CLIENT_NAME)
-  ret_client.on_connect = on_connect_resp
-  ret_client.connect(OUTPUT_HOST_NAME, port=1883)
-  clients.append(mqttClient)
-  clients.append(ret_client)
-  while(True):
-    for client in clients:
-      client.loop(0.1)
+  mqttClient.loop_forever()
 
 
 if __name__ == "__main__":

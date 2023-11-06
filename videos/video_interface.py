@@ -25,7 +25,7 @@ def video_classify():
     labels = read_label_file("test_data/coco_labels.txt")
     inference_size = input_size(interpreter)
     cap = cv2.VideoCapture(f'rtsp://{username}:{password}@{ip}/{endpoint}')
-    idclient = uuid.UUID("02")
+    idclient = uuid.uuid1()
     client =mqtt.Client(CLIENT_NAME)
     client.on_connect = on_connect
 
@@ -60,6 +60,7 @@ def video_classify():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
     
+    client.loop_stop()
     cap.release()
     cv2.destroyAllWindows()
 

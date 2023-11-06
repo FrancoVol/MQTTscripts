@@ -19,11 +19,12 @@ def on_connect(client, userdata, flags, rc):  # The callback for when the client
 
 if __name__ == '__main__':
     
-    idclient = uuid.UUID("01")
+    idclient = uuid.uuid1()
     client =mqtt.Client(CLIENT_NAME)
     client.on_connect = on_connect
 
-    client.tls_set(ca_certs="/home/franco/Desktop/mqtt/certs/ca.crt")	#absolute path to the certificate
+    client.tls_set(ca_certs="/home/francovolante/Desktop/certs/ca.crt", certfile="/home/francovolante/Desktop/certs/client.crt", keyfile="/home/francovolante/Desktop/certs/client.key")	#absolute path to the certificate
+    client.username_pw_set(username="sensor", password="sensor")
     client.tls_insecure_set(False)
     client.connect(HOST_NAME, port=8883)
 	
