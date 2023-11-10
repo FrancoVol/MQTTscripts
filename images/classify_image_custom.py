@@ -32,6 +32,7 @@ python3 examples/classify_image.py \
 import argparse
 import time
 import io
+import json
 
 import numpy as np
 from PIL import Image
@@ -88,8 +89,11 @@ def mqtt_classify(bytearray):
         print('%.1fms' % (inference_time * 1000))
 
     print('-------RESULTS--------')
+    output = {"bn" : [], "bt" : time.time(), "e" : []}
+
     ##invece di fare questa print, ritornare o una stringa o i dati necessari per creare un json da rispedire con mqtt
     for c in classes:
+        output["e"].append({"n" : labels.get(c.id,c.id), "u":"result","v":c.score})
         #print('%s: %.5f' % (labels.get(c.id, c.id), c.score))
-        outstring = "%s: %.5f" % (labels.get(c.id,c.id), c.score)
-    return outstring
+        #outstring = "%s: %.5f" % (labels.get(c.id,c.id), c.score)
+    return output

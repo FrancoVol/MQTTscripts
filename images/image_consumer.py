@@ -11,7 +11,7 @@ def on_connect(client, userdata, flags, rc):  # The callback for when the client
     client.subscribe("fvolante/output/image/#")
     
 def on_message(client, userdata, message):
-    print("Message received: ", message.payload)
+    print("Message received: ", json.loads(message.payload))
     
     
     

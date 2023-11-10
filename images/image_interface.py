@@ -24,15 +24,16 @@ def on_connect_resp(client, userdata, flags, rc):  # The callback for when the c
 def on_message(client, userdata, message):
     print("Message received.")
     topic = message.topic
-    outstring = image_classify.mqtt_classify(message.payload)
+    messagejson = json.loads(message.payload)
+    output = image_classify.mqtt_classify(messagejson['e']['v'])
     ret_client = mqtt.Client(CLIENT_NAME)
     ret_client.on_connect = on_connect_resp
     ret_client.connect(OUTPUT_HOST_NAME,port=1883)
     ret_client.loop_start()
-    ret_client.publish("fvolante/output/" + topic, str(outstring))
+    ret_client.publish("fvolante/output/" + topic, json.dumps(output))
     ret_client.loop_stop()
     ret_client.disconnect()
-    print("Done publishing " + str(outstring))
+    print("Done publishing ")
     
 	
 
