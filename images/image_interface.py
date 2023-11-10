@@ -26,6 +26,7 @@ def on_message(client, userdata, message):
     topic = message.topic
     messagejson = json.loads(message.payload)
     output = image_classify.mqtt_classify(messagejson['e']['v'])
+    output["bn"].append(messagejson["bn"])
     ret_client = mqtt.Client(CLIENT_NAME)
     ret_client.on_connect = on_connect_resp
     ret_client.connect(OUTPUT_HOST_NAME,port=1883)

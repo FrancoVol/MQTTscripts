@@ -5,7 +5,7 @@ from zipfile import ZipFile
 import time
 import os
 import paho.mqtt.client as mqtt
-
+import json
 
 # Client Name
 CLIENT_NAME = 'IoT'
@@ -157,10 +157,11 @@ def on_connect_resp(client, userdata, flags, rc):  # The callback for when the c
 
 def on_message(client, userdata, message):
     print("Message received.")
+    obj = json.loads(message.payload)
     topic = message.topic
     if(len(input)==120):
       input.pop(0)
-    input.append(message.payload)
+    input.append(obj["e"]["v"])
     if (len(input) == 120):
       topredict = np.uint8([input])
       prediction = predict_weather(interpreter, topredict)
@@ -168,7 +169,8 @@ def on_message(client, userdata, message):
       ret_client.on_connect = on_connect_resp
       ret_client.connect(OUTPUT_HOST_NAME, port=1883)
       ret_client.loop_start()
-      ret_client.publish("/fvolante/output/" + topic, prediction[0])
+      tosend = {"bn" : obj["bn"], "bt" : time.time(), "e" : {"n": "prediction", "u":"float", "v": prediction[0]}}
+      ret_client.publish("/fvolante/output/" + topic, json.dumps(tosend))
       ret_client.loop_stop()
       ret_client.disconnect()
       

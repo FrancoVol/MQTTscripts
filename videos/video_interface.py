@@ -3,6 +3,7 @@ import os
 import time
 import uuid
 import paho.mqtt.client as mqtt
+import json
 
 from pycoral.adapters.common import input_size
 from pycoral.adapters.detect import get_objects
@@ -50,7 +51,10 @@ def video_classify():
 
         ### dentro cv2_im a questo punto c'è l'immagine con i bound identificati, che a questo punto deve essere inviata come risposta per mqtt
         msg = bytearray(cv2_im)
-        result = client.publish("fvolante/video/output/"+ str(idclient), msg)
+        jsonobj = {"bn" : idclient, "bt" : time.time(), "e" : {"n": "image", "u":"bytearray", "v": msg}}
+
+        result = client.publish("fvolante/video/output/"+ str(idclient), json.dumps(jsonobj))
+        
         msg_status = result[0]
         if msg_status == 0:
             print("Message sent correctly")

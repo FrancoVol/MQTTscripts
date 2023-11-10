@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import time
 import uuid
+import json
 
 #####IMPORTANT: RUN USING PYTHON3, DOES NOT WORK WITH PYTHON2 DUE TO THE FACT THAT PAHO MQTT ONLY SENDS STRINGS
 #####			FOR SOME REASON, AND IN THIS EXAMPLE THERE IS THE NEED TO SEND A BYTEARRAY
@@ -30,9 +31,11 @@ if __name__ == '__main__':
 	
     client.loop_start()
     msg = [ 137 , 133 , 130 , 124 , 138 , 134 , 132 ]
+    jsonobj = {"bn" : idclient, "bt" : time.time(), "e" : {"n": "sensor", "u":"float", "v": msg}}
+
     time.sleep(1)
     
-    result = client.publish("input/image/"+ str(idclient), str(msg))
+    result = client.publish("input/image/"+ str(idclient), json.dumps(jsonobj))
     msg_status = result[0]
     if msg_status == 0:
         print("Message sent correctly")
