@@ -34,8 +34,8 @@ if __name__ == '__main__':
     
     with open('parrot.jpg', 'rb') as file:
         file_content = file.read()
-        msg = bytearray(file_content)
-        jsonobj = {"bn" : idclient, "bt" : time.time(), "e" : {"n": "image", "u":"bytearray", "v": msg}}
+        #msg = bytearray(file_content)
+        jsonobj = {"bn" : str(idclient), "bt" : time.time(), "e" : {"n": "image", "u":"bytearray", "v": file_content}}
         result = client.publish("image/"+ str(idclient), json.dumps(jsonobj))
         msg_status = result[0]
         if msg_status == 0:
